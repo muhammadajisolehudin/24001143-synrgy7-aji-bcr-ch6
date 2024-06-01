@@ -1,12 +1,14 @@
 import express, { Request, Response, NextFunction, Router } from 'express';
 import * as controllers from '../app/controllers';
 import uploadeHandler from '../app/middlewares/uploadeHandler';
-import { auth, isAdmin } from '../app/middlewares/auth';
+import { auth, isAdmin, isSuperAdmin } from '../app/middlewares/auth';
 
 const apiRouter: Router = express.Router();
 
 apiRouter.post('/api/v1/login', controllers.api.v1.authController.login);
 apiRouter.post('/api/v1/register', controllers.api.v1.authController.register);
+
+apiRouter.post('/api/v1/super_admin/register', auth, isSuperAdmin, controllers.api.v1.adminRegistrationController.register);
 
 apiRouter.get('/api/v1/cars', auth, controllers.api.v1.carController.list);
 apiRouter.get('/api/v1/cars/:id',auth , controllers.api.v1.carController.show);

@@ -76,7 +76,7 @@ const isSuperAdmin = (req: Request, res: Response, next: NextFunction) => {
       message: 'No user information',
     });
   }
-  if (req.user.role !== 'superadmin') {
+  if (req.user.role !== 'super_admin') {
     return res.status(403).json({
       status: false,
       message: 'Forbidden',

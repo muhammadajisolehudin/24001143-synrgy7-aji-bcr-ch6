@@ -5,12 +5,12 @@
 
 import carController from "./carController";
 import authController from "./authController";
-// import adminRegistrationController from "./adminRegistrationController"
+import adminRegistrationController from "./adminRegistrationController"
 
 export {
   carController,
-  authController
-  // adminRegistrationController
+  authController,
+  adminRegistrationController
   
 };
 
