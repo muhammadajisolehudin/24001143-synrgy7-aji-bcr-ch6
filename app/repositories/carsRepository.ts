@@ -3,7 +3,7 @@ import { CarsModel, Car } from '../models/cars';
 import knexInstance from '../../config/knex';
 
 export default class CarsRepository {
-    private readonly knexInstance: Knex;
+   private readonly knexInstance: Knex;
 
     constructor(knexInstance: Knex) {
         this.knexInstance = knexInstance;

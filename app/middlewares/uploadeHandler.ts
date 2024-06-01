@@ -1,6 +1,5 @@
 import multer, { StorageEngine } from 'multer';
 import path from 'path';
-import { Request } from 'express';
 import fs from 'fs';
 
 // const PUBLIC_DIR: string = path.join(__dirname, '../public');

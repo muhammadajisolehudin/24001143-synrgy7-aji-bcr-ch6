@@ -26,7 +26,7 @@ const loginUser = async (req: Request, res: Response, next: NextFunction): Promi
         } 
     } catch (error) {
         res.status(500).json({
-            status: "FAIL", 
+            status: "ERROR", 
             message: "Internal server error" 
         });
     }
@@ -37,24 +37,24 @@ const registerUser = async (req:Request, res:Response, next: NextFunction): Prom
         const result = await AuthService.register(req.body)
         if (result.status === 200 && result.user) {
             res.status(200).json({ 
-                status: "Ok", 
+                status: "OK", 
                 message: "member has been successfully registered", 
                 user: result.user 
             });
         }  else if (result.error === 'REQUIRED') {
             res.status(401).json({ 
-                status:"Fail", 
+                status:"FAIL", 
                 message: "all files are required" 
             });
         } else {
             res.status(401).json({ 
-                status:"Fail", 
+                status:"FAIL", 
                 message: "username has been registered" 
             });
         } 
     } catch (error) {
         res.status(500).json({ 
-            status: "Fail", 
+            status: "ERROR", 
             message: "Internal server error" 
         });
     }

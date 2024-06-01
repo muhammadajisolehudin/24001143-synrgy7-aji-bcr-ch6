@@ -18,7 +18,56 @@ interface JwtPayload {
   role: string;
 }
 
-const auth = async (req: Request, res: Response, next: NextFunction) => {
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    role: string;
+  };
+}
+
+// const auth = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const { authorization } = req.headers;
+
+//     if (!authorization) {
+//       return res.status(401).json({
+//         status: false,
+//         message: 'Invalid Token',
+//       });
+//     }
+
+//     const token = authorization.split(' ')[1];
+//     const data = jwt.verify(token, JWT_SECRET_KEY) as JwtPayload;
+
+//     const user = await UserModel.query().findById(data.id);
+//     if (!user) {
+//       return res.status(401).json({
+//         status: false,
+//         message: 'User not found',
+//       });
+//     }
+
+//     req.user = {
+//       id: user.id,
+//       role: user.role,
+//     };
+
+//      req.user = {
+//       id: user.id,
+//       role: user.role,
+//     }
+
+//     next();
+    
+//   } catch (error: any) {
+//     res.status(500).json({
+//       status: false,
+//       message: 'Internal Server Error',
+//     });
+//   }
+// };
+
+const auth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const { authorization } = req.headers;
 
@@ -44,6 +93,7 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
       id: user.id,
       role: user.role,
     };
+
     next();
   } catch (error: any) {
     res.status(500).json({
@@ -51,7 +101,7 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
       message: 'Internal Server Error',
     });
   }
-};
+}
 
 const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
@@ -66,6 +116,7 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
       message: 'Forbidden',
     });
   }
+  
   next();
 };
 

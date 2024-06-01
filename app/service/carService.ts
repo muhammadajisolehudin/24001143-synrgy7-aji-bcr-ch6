@@ -1,5 +1,4 @@
 import { carsRepository } from '../repositories/carsRepository';
-import { v4 as uuidv4 } from 'uuid';
 
 interface Car {
   id: string;
@@ -12,8 +11,8 @@ interface Car {
   price: number;
   create_by: string;
   update_by: string;
-  created_at: string;
-  updated_at: string;
+  created_at: Date;
+  updated_at: Date;
 }
 
 interface ListResult {
@@ -21,67 +20,65 @@ interface ListResult {
   count: number;
 }
 
-const create = async (requestBody: Car): Promise<{ status: number; message: string; car?: Car }> => {
+const create = async (body:Car, img:any, userId:string) => {
   try {
-    // Menghasilkan UUID v4 baru
-    const id = uuidv4();
-
-     // Set the ID to the requestBody
     const newCar: Car = {
-      ...requestBody,
-      id,
-      img: requestBody.img || '',
-      create_by: requestBody.create_by || '',
-      update_by: requestBody.update_by || '',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    } as Car;
-
-
-    // Membuat entitas mobil dengan ID yang telah ditetapkan
+      ...body,
+      img:img,
+      create_by: userId,
+      update_by: userId,
+    };
+  
     const createdCar = await carsRepository.create(newCar);
-
     return { status: 200, message: 'Car created successfully', car: createdCar };
+
   } catch (error: any) {
     return { status: 400, message: `Validation error: ${error.message}` };
   }
 };
 
-const list = async (): Promise<{ status: number; message: string;  data?: ListResult }> => {
+const list = async () => {
   try {
     const data = await carsRepository.list();
-    return { status: 200, message: 'Cars retrieved successfully', data: { data, count: data.length } };
+    return { status: 200, data: { data, count: data.length } };
+
   } catch (error: any) {
     return { status: 500, message: `Internal server error: ${error.message}` };
   }
 };
 
 
-const getById = async (id: string): Promise<{ status: number; message: string; car?: Car }> => {
+const getById = async (id: string) => {
   try {
     const car = await carsRepository.getById(id);
     if (!car) {
-      return { status: 404, message: 'Car not found' };
+      return { status: 404 };
     }
-    return { status: 200, message: 'Car retrieved successfully', car };
+    return { status: 200, car };
+
   } catch (error: any) {
     return { status: 500, message: `Internal server error: ${error.message}` };
   }
 };
 
-const update = async (id: string, data: Car): Promise<{ status: number; message: string; car?: Car }> => {
+const update = async (id: string, body:Car, img:any, userId:string) => {
   try {
-    // Panggil repository untuk melakukan update
     const car = await carsRepository.getById(id);
     if (!car) {
-      // Jika mobil tidak ditemukan, kembalikan pesan yang sesuai
       return { status: 404, message: `Car with id ${id} not found` };
     }
-    await carsRepository.update(id, data)
+    const newCar: Car = {
+      ...body,
+      img:img,
+      update_by: userId,
+    };
+
+    await carsRepository.update(id, newCar)
     return { status: 200, message: 'Car updated successfully'};
+
   } catch (error: any) {
     // Tangani error jika terjadi
-    return { status: 500, message: `Failed to update car: ${error.message}` };
+    return { status: 500, message: `Internal server error: ${error.message}` };
   }
 };
 
@@ -91,16 +88,22 @@ const remove = async (id: string): Promise<{ status: number; message: string }> 
     const car = await carsRepository.getById(id);
     
     if (!car) {
-      // Jika mobil tidak ditemukan, kembalikan respons yang sesuai
       return { status: 404, message: 'Car not found' };
     }
-    // Lakukan penghapusan mobil jika ditemukan
+    
     await carsRepository.remove(id);
     return { status: 200, message: 'Car removed successfully' };
+
   } catch (error: any) {
     return { status: 500, message: `Internal server error: ${error.message}` };
   }
 };
 
 
-export { create, list, getById, update, remove };
+export { 
+  create, 
+  list, 
+  getById, 
+  update, 
+  remove 
+};

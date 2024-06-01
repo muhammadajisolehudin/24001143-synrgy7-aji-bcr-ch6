@@ -3,13 +3,13 @@ import * as carService from '../../../service/carService'; // Menggunakan * as u
 
 const listCars = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const result = await carService.list(); // Panggil fungsi list dari service
+    const result = await carService.list(); 
     if (result.status === 200) {
       // Jika status dari hasil adalah 200, kirimkan respons berhasil
       res.status(200).json({
         status: 'OK',
-        data: { cars: result.data?.data }, // Ambil data mobil dari hasil
-        meta: { total: result.data?.count }, // Ambil total dari hasil
+        data: { cars: result.data?.data }, 
+        meta: { total: result.data?.count },
       });
     } else {
       // Jika status dari hasil bukan 200, kirimkan respons gagal
@@ -46,67 +46,39 @@ const listCars = async (req: Request, res: Response, next: NextFunction): Promis
 // dengan form data
 const createCar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { plat_no, name, color, tahun_produksi, status, price, create_by, update_by } = req.body;
     const img = req.file ? req.file.path : undefined;
+    const userId = req.user!.id; // Pastikan req.user sudah terdefinisi
 
-    const car = {
-      id: '',
-      plat_no,
-      name,
-      color,
-      img,
-      tahun_produksi: parseInt(tahun_produksi),
-      status: status === 'true',
-      price: parseInt(price),
-      create_by,
-      update_by,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    const result = await carService.create(car);
+    const result = await carService.create(req.body, img, userId);
     res.status(result.status).json({
       status: 'OK',
       data: result.car,
       message: result.message,
     });
   } catch (err) {
-    res.status(422).json({
-      status: 'FAIL',
+    res.status(500).json({
+      status: 'ERROR',
       message: (err as Error).message,
     });
   }
 };
 
-
 const updateCar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { plat_no, name, color, tahun_produksi, status, price, create_by, update_by } = req.body;
     const img = req.file ? req.file.path : undefined;
-
-    const car = {
-      id: req.params.id,
-      plat_no,
-      name,
-      color,
-      img,
-      tahun_produksi: parseInt(tahun_produksi),
-      status: status === 'true' || status === true,
-      price: parseInt(price),
-      create_by,
-      update_by,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
+    const userId = req.user!.id; 
     // Panggil service untuk melakukan update
-    const result = await carService.update(req.params.id, car);
+    const result = await carService.update(req.params.id, req.body, img, userId);
     
-    // Tampilkan pesan respons sesuai dengan hasil operasi update
-    res.status(result.status).json({ status: result.status === 200 ? 'OK' : 'FAIL', message: result.message });
+    res.status(result.status).json({ 
+      status: result.status === 200 ? 'OK' 
+      : 'FAIL', message: result.message 
+    });
   } catch (err) {
-    // Tangani kesalahan jika terjadi
-    res.status(422).json({ status: 'FAIL', message: (err as Error).message });
+    res.status(500).json({
+      status: 'ERROR',
+      message: (err as Error).message,
+    });
   }
 };
 
@@ -118,8 +90,8 @@ const showCar = async (req: Request, res: Response, next: NextFunction): Promise
       data: result,
     });
   } catch (err) {
-    res.status(422).json({
-      status: 'FAIL',
+    res.status(500).json({
+      status: 'ERROR',
       message: (err as Error).message,
     });
   }
@@ -142,8 +114,8 @@ const destroyCar = async (req: Request, res: Response, next: NextFunction): Prom
       message: result.message,
     });
   } catch (err) {
-    res.status(422).json({
-      status: 'FAIL',
+    res.status(500).json({
+      status: 'ERROR',
       message: (err as Error).message,
     });
   }
